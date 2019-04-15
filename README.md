@@ -6,11 +6,11 @@ Try finding a Hamiltonian path/cycle in the planar dodecahedron Graph (Hamilton'
 
 First, clone this repository
 
-    git clone https://github.com/explorablesforsfi/ising.git
+    git clone https://github.com/explorablesforsfi/hamiltonian-paths.git
 
 Then change to the created directory and start a local webserver
 
-    cd ising
+    cd hamiltonian-paths
     python -m "http.server" 1313
     
 Go to your browser and navigate to http://localhost:1313 .
