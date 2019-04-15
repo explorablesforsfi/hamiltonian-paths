@@ -11,7 +11,7 @@ function link_id(source,target){
     target = tmp;
   }
 
-  return "#link-"+source+"-"+target;
+  return "link-"+source+"-"+target;
 }
 
 const width = 600;
@@ -31,13 +31,13 @@ let scale = 20;
 let xScale = d3.scaleLinear().domain([0,1]).range([dod_origin[0],dod_origin[0]+scale]);
 let yScale = d3.scaleLinear().domain([0,1]).range([dod_origin[1]+scale,dod_origin[1]]);
 let radius = 5;
-let select_color = "#1b9e77";
-let deselect_color = "#d95f02";
+let deselect_color = "#1b9e77";
+let select_color = "#d95f02";
+let default_link_color = "#999";
 
 let isSelected = [];
 let graph = [];
 let last_selected = null;
-
 
 let show_labels = false;
 let base_label;
@@ -62,8 +62,6 @@ d3.json('./dodecahedron.json').then(function(data){
   //});
 
   base_link = svg.append("g")
-      .attr("stroke", "#999")
-      .attr("stroke-opacity", 1.0)
     .selectAll("line")
     .data(links)
     .join("line")
@@ -72,6 +70,8 @@ d3.json('./dodecahedron.json').then(function(data){
       .attr("x2",d => xScale(nodes[d.target].x))
       .attr("y1",d => yScale(nodes[d.source].y))
       .attr("y2",d => yScale(nodes[d.target].y))
+      .attr("stroke", default_link_color)
+      .attr("stroke-opacity", 1.0)
       .attr("stroke-width", 1.5);
 
   base_node = svg.append("g")
@@ -158,32 +158,51 @@ function handleMouseClick(d, i) {
        )
      )
   {
-    path.push(i);
-    last_selected = i;
-    isSelected[i] = true;
+    if (!(last_selected === null))
+    {
+      d3.select("#"+link_id(i,last_selected))
+        .attr("stroke",select_color)
+        .attr("stroke-width",3)
+    }
 
     d3.select("#node-"+i)
       .attr("fill", select_color)
       .attr("stroke", deselect_color);
 
-    
-
+    path.push(i);
+    last_selected = i;
+    isSelected[i] = true;
   }
   else if (isSelected[i])
   {
 
     if (i == last_selected)
     {
+      if (path.length>=2)
+      {
+        d3.select("#"+link_id(last_selected,path[path.length-2]))
+          .attr("stroke",default_link_color)
+          .attr("stroke-width",1.5)
+      }
+
       d3.select("#node-"+i)
         .attr("fill", "#fff")
         .attr("stroke", select_color);
       path.pop();
+      isSelected[i] = false;
 
     }
     else
     {
       for(let j=path.length-1; j>=0 && i!=path[j]; --j)
       {
+        if (j-1>=0)
+        {
+          d3.select("#"+link_id(path[j],path[j-1]))
+            .attr("stroke",default_link_color)
+            .attr("stroke-width",1.5)
+        }
+
         d3.select("#node-"+path[j])
           .attr("fill", "#fff");
         isSelected[path[j]] = false;
