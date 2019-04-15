@@ -1,8 +1,6 @@
-# Ising Model
+# Hamiltion Paths and the Icosian Game
 
-This is a small web app to demonstrate magnetization
-at finite temperature using the Ising model and Glauber's
-dynamics and to explore the associated phase transition.
+Try finding a Hamiltonian path/cycle in the planar dodecahedron Graph (Hamilton's Icosian game).
 
 ## Run
 
@@ -26,6 +24,4 @@ All original code in this repository, i.e. all code which is not in the subdirec
 |--------------------------------|-----------------------------------------|-------------------|
 | `d3-color.v1.min.js`           | BSD 3-Clause "New" or "Revised" License | [d3-color](https://github.com/d3/d3-color)|
 | `d3-scale-chromatic.v1.min.js` | BSD 3-Clause "New" or "Revised" License | [d3-scale-chromatic](https://github.com/d3/d3-scale-chromatic)|
-| `d3.v4.min.js`                 | BSD 3-Clause "New" or "Revised" License | [d3](https://github.com/d3/d3)|
-| `fourier.js`                   | MIT                                     | [JS-Fourier-Image-Analysis](https://github.com/turbomaze/JS-Fourier-Image-Analysis)|
-| `simple_plot.js`               | CC 4.0                                  | [simple-plot](https://github.com/benmaier/simple-plot)|
+| `d3.v5.min.js`                 | BSD 3-Clause "New" or "Revised" License | [d3](https://github.com/d3/d3)|
