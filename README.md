@@ -15,7 +15,7 @@ Then change to the created directory and start a local webserver
     
 Go to your browser and navigate to http://localhost:1313 .
 
-![output](https://github.com/explorablesforsfi/hamilton-paths/raw/master/img/example.gif)
+![output](https://github.com/explorablesforsfi/hamiltonian-paths/raw/master/img/example.gif)
 
 ## License
 
