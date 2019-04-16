@@ -1,4 +1,4 @@
-# Hamiltion Paths and the Icosian Game
+# Hamiltonian Paths and the Icosian Game
 
 Try finding a Hamiltonian path/cycle in the planar dodecahedron Graph (Hamilton's Icosian game).
 
