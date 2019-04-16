@@ -1,0 +1,1 @@
+{"directed": false, "multigraph": false, "graph": {"name": "Test Graph"}, "nodes": [{"x": 0.9510565162951535, "y": -0.3090169943749474, "id": 0}, {"x": 0.5877852522924732, "y": 0.8090169943749473, "id": 1}, {"x": 6.123233995736766e-17, "y": -1.0, "id": 2}], "links": [{"source": 0, "target": 1}, {"source": 0, "target": 2}, {"source": 1, "target": 2}]}
