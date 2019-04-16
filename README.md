@@ -15,6 +15,8 @@ Then change to the created directory and start a local webserver
     
 Go to your browser and navigate to http://localhost:1313 .
 
+![output](https://github.com/explorablesforsfi/hamilton-paths/raw/master/img/example.gif)
+
 ## License
 
 All original code in this repository, i.e. all code which is not in the subdirectory `/libs/` is licensed under the CC 4.0 licence. The subdirectory `/libs/` contains external libraries which are licensed as follows
