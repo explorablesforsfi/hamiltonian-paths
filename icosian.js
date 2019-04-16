@@ -14,7 +14,7 @@ function link_id(source,target){
   return "link-"+source+"-"+target;
 }
 
-const width = 600;
+const width = 400;
 const height = 400;
 const svg = d3.select('#icosian_container')
               .append("svg")
@@ -26,12 +26,12 @@ let link, node;
 
 let path = [];
 
-let dod_origin = [width/3.5, height/2];
+let dod_origin = [width/2, height/2];
 let scale = 30;
 let xScale = d3.scaleLinear().domain([0,1]).range([dod_origin[0],dod_origin[0]+scale]);
 let yScale = d3.scaleLinear().domain([0,1]).range([dod_origin[1]+scale,dod_origin[1]]);
 let radius = 8;
-let deselect_color = "#1b9e77";
+let deselect_color = "#333";
 let select_color = "#d95f02";
 let default_link_color = "#999";
 let default_link_width = 1.5;
@@ -47,8 +47,22 @@ let line = d3.line();
 let base_path;
 
 let can_play = true;
-let graph_url = './dodecahedron.json';
-graph_url = './test.json';
+let graph_url = './data/dodecahedron.json';
+//graph_url = './data/test.json';
+let celebration_duration = 250;
+let celebration_ease = d3.easeCircleInOut;
+let celebration_line = d3.line().x(d=>d[0]).y(d=>d[1]).curve(d3.curveBasis);
+let celebration_path;
+let celebration_text;
+// funky celebration
+let celeb_data_0 = [[1.2*width/3.5,height/5],[1.2*width/2,height/20],[2.6*width/3.5,height/5]];
+let celeb_data_1 = [[1.2*width/3.5,height/5],[0.8*width/2,height/20],[2.6*width/3.5,height/5]];
+//not so funky celebration
+celeb_data_0 = [[width/5,height/8],[width,height/8]];
+celeb_data_1 = [[width/2.5,height/8],[width,height/8]];
+
+
+// load the data and create the svg elements
 
 d3.json(graph_url).then(function(data){
   links = data.links.map(d => Object.create(d));
@@ -60,7 +74,6 @@ d3.json(graph_url).then(function(data){
   });
 
   data.links.forEach(function(d){
-    console.log(d);
     graph[d.source].push(d.target);
     graph[d.target].push(d.source);
   });
@@ -90,7 +103,22 @@ d3.json(graph_url).then(function(data){
                 .attr("stroke-width",3.0)
                 .selectAll("line")
               ;
+
+  celebration_path = svg.append("g")
+    .attr("stroke-width",1)
+    .attr("stroke","rgba(0,0,0,0)")
+    .attr("fill","rgba(0,0,0,0)")
+    .append("path")
+    .attr("d",celebration_line(celeb_data_0))
+    .attr("id","celeb")
+  ;
               
+  celebration_text = svg.append("text")
+    .attr("font-family", "Helvetica")
+    .attr("id","celeb-text")
+    .append("textPath")
+    .attr("xlink:href","#celeb");
+
   base_node = svg.append("g")
       .attr("stroke", "#333")
     .selectAll("circle")
@@ -124,8 +152,10 @@ d3.json(graph_url).then(function(data){
 
 
 function reset() {
-  path = 0;
-  last_selected = 0;
+  path.length = 0;
+  last_selected = null;
+  can_play = true;
+  isSelected = nodes.map(n => false)
 
   base_link.transition()
       .attr("stroke", default_link_color)
@@ -136,7 +166,12 @@ function reset() {
   base_node.transition()
       .attr("fill", "#fff")
       .attr("stroke-width", 1)
+      .attr("r",radius)
       ;
+
+  celebration_text
+      .text("")
+  ;
 }
 
 function handleMouseOver(d, i) {  // Add interactivity
@@ -148,6 +183,7 @@ function handleMouseOver(d, i) {  // Add interactivity
     d3.select("#node-"+i)
       .attr("stroke", select_color)
       .attr("stroke-width", 2)
+      .style("cursor", "pointer"); 
     ;
     return;
   }
@@ -158,6 +194,7 @@ function handleMouseOver(d, i) {  // Add interactivity
     d3.select("#node-"+i)
       .attr("stroke", deselect_color)
       .attr("stroke-width", 2)
+      .style("cursor", "pointer"); 
     ;
   }
   else if ( (!isSelected[i]) && 
@@ -170,15 +207,33 @@ function handleMouseOver(d, i) {  // Add interactivity
     d3.select("#node-"+i)
       .attr("stroke", select_color)
       .attr("stroke-width", 2)
+      .style("cursor", "pointer"); 
     ;
+    d3.select("#"+link_id(i,last_selected))
+      .attr("stroke",select_color)
+      .attr("stroke-width",2)
+      .style("cursor", "pointer"); 
   }
 }
 
 function handleMouseOut(d, i) {
     d3.select("#node-"+i)
-      .attr("stroke", "#000")
+      .attr("stroke", "#333")
       .attr("stroke-width", 1.0)
+      .style("cursor", "default"); 
   ;
+  if ( (!isSelected[i]) && 
+       ( 
+          (last_selected === null) || 
+          (contains(graph[i],last_selected)) 
+       )
+     )
+  {
+    d3.select("#"+link_id(i,last_selected))
+      .attr("stroke",default_link_color)
+      .attr("stroke-width",default_link_width)
+      .style("cursor", "pointer"); 
+  }
 }
 
 function handleMouseClick(d, i) {
@@ -194,7 +249,8 @@ function handleMouseClick(d, i) {
   {
     if (!(last_selected === null))
     {
-      d3.select("#"+link_id(i,last_selected))
+      let link_selection = "#"+link_id(i,last_selected);
+      d3.select(link_selection)
         .transition()
         .attr("stroke",select_color)
         .attr("stroke-width",3)
@@ -204,24 +260,29 @@ function handleMouseClick(d, i) {
     last_selected = i;
     isSelected[i] = true;
 
+    if ((path.length == nodes.length) && (contains(graph[path[0]], last_selected)))
+    {
+      let link_selection = "#"+link_id(path[0],last_selected);
+      d3.select(link_selection)
+        .transition()
+        .attr("stroke",select_color)
+        .attr("stroke-width",3);
+    }
+
     d3.select("#node-"+i)
           .transition()
       .attr("fill", select_color)
-      .attr("stroke", "#000")
-    .on("end",function(){
-
-      if (path.length == nodes.length)
-      {
-        can_play = false;
-        celebrate();
-      }
+      .attr("stroke", "#333")
+      .on("end",function(){
+          if (path.length == nodes.length)
+          {
+            can_play = false;
+            celebrate();
+          }
     });
-    
-
   }
   else if (isSelected[i])
   {
-
     if (i == last_selected)
     {
       if (path.length>=2)
@@ -235,7 +296,7 @@ function handleMouseClick(d, i) {
       d3.select("#node-"+i)
         .transition()
         .attr("fill", "#fff")
-        .attr("stroke", "#000");
+        .attr("stroke", "#333");
       path.pop();
       isSelected[i] = false;
 
@@ -255,7 +316,7 @@ function handleMouseClick(d, i) {
         d3.select("#node-"+path[j])
           .transition()
           .attr("fill", "#fff")
-          .attr("stroke", "#000");
+          .attr("stroke", "#333");
         isSelected[path[j]] = false;
         path.pop();
         
@@ -273,6 +334,7 @@ function handleMouseClick(d, i) {
     
   }
 
+  handleMouseOut(d,i);
   //console.log(path,last_selected);
   //draw_path();
 }
@@ -344,36 +406,68 @@ function celebrate()
   if (contains(graph[path[0]], last_selected))
   {
     celebration = "cycle";
-      d3.select("#"+link_id(path[0],last_selected))
-        .attr("stroke",select_color)      
-        .attr("stroke-width", 3);
     link_selection += ",#" + link_id(path[0],last_selected);
   }
+  celebration_text
+    .text("YOU FOUND A "+celebration.toUpperCase()+"!")
+    ;
 
   function repeat(){
+    d3.select("#celeb-text")
+      .transition()
+      .ease(celebration_ease)
+      .duration(celebration_duration)
+      .attr('fill',select_color)
+      //.attr("transform","rotate(180 "+dod_origin[0]+" "+dod_origin[1]+")")
+      .transition()
+      .ease(celebration_ease)
+      .duration(celebration_duration)
+      .attr('fill','#000')
+      //.attr("transform","rotate(360 "+dod_origin[0]+" "+dod_origin[1]+")")
+    ;
+
+
+
+    d3.select("#celeb")
+      .transition()
+      .ease(celebration_ease)
+      .duration(celebration_duration)
+      .attr("d",celebration_line(celeb_data_1))
+      .transition()
+      .ease(celebration_ease)
+      .duration(celebration_duration)
+      .attr("d",celebration_line(celeb_data_0))
+    ;
+
+      
     d3.selectAll(node_selection)
       .transition()
-      .duration(500)
-      .attr("r",2*radius)
+      .ease(celebration_ease)
+      .duration(celebration_duration)
+      .attr("r",Math.sqrt(2)*radius)
       .transition()
-      .duration(500)
+      .ease(celebration_ease)
+      .duration(celebration_duration)
       .attr("r",radius);
 
     d3.selectAll(link_selection)
       .transition()
-      .duration(500)
-      .attr("stroke-width",6)
+      .ease(celebration_ease)
+      .duration(celebration_duration)
+      .attr("stroke-width",7)
       .transition()
-      .duration(500)
+      .ease(celebration_ease)
+      .duration(celebration_duration)
       .attr("stroke-width",3)
-      //.on("end",repeat());
+      .on("end",function(){
+        d3.timeout(repeat,0);
+      });
   }
-  console.log(node_selection);
-  console.log(link_selection);
 
   repeat();
 }
 
+// maybe later
 function draw_path()
 {
   let path_links = [];
@@ -384,8 +478,6 @@ function draw_path()
       path_links.push({source:path[i], target:path[i+1], id: i});
     }
   }
-
-  console.log(path_links);
 
   base_path.data(path_links);
 
