@@ -5,14 +5,32 @@
 <script src="./libs/d3-color.v1.min.js"></script>
 <script src="./libs/widget.v3.4.js"></script>
 <link rel="stylesheet" type="text/css" href="./css/widgets_white_bg.css">
+<link rel="stylesheet" type="text/css" href="./css/main.css">
 <!--
 <link rel="stylesheet" type="text/css" href="./css/toggle.css">
 <link rel="stylesheet" type="text/css" href="./css/slider.css">
 -->
 </head>
 <body>
+    <div style="max-width: 450px;">
 
-    <div id="icosian_container" style="float:left;"></div>
+        <h2>Hamiltonian Paths and the Icosian Game</h2>
+
+        <p>
+        In graph theory, a <i>Hamiltonian path</i> is a path on which
+        each node is visited only once. In a <i>Hamiltonian cycle</i>
+        it is possible to jump from the last node of the path to
+        the first node of the path, thus forming a cycle. Hamilton
+        tried to market the so-called <i>Icosian Game</i> in 1856,
+        where players should find a Hamiltonian path/cycle in the 
+        dodecahedron graph. Below you can find a single-player 
+        version of this game. Can you find either one of those?
+        </p>
+
+
+        <div id="icosian_container" style="float:left;"></div>
+
+    </div>
 
 <script src="./icosian.js"></script>
 <script src="./gui/reset_button.js"></script>
