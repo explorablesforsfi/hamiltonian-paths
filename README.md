@@ -17,6 +17,39 @@ Go to your browser and navigate to http://localhost:1313 .
 
 ![hamiltonian-paths](https://github.com/explorablesforsfi/hamiltonian-paths/raw/master/img/example.gif)
 
+## Modify
+
+Add your own graph as a json-file and load it in `index_html` as `graph_url = './path/to/graph.js'`. This file must be of the following structure:
+
+```json
+{
+  "links": [
+    {
+      "source": 0,
+      "target": 1
+    },
+    {
+      "source": 0,
+      "target": 19
+    },
+    ...
+  ],
+  "nodes": [
+    {
+      "id": 0,
+      "x": 0.9510565162951535,
+      "y": -0.3090169943749474
+    },
+    {
+      "id": 1,
+      "x": 0.5877852522924732,
+      "y": 0.8090169943749473
+    },
+    ...
+  ]
+}
+```
+
 ## License
 
 All original code in this repository, i.e. all code which is not in the subdirectory `/libs/` is licensed under the CC 4.0 licence. The subdirectory `/libs/` contains external libraries which are licensed as follows

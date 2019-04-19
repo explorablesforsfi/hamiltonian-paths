@@ -47,8 +47,6 @@ let line = d3.line();
 let base_path;
 
 let can_play = true;
-let graph_url = './data/dodecahedron.json';
-//graph_url = './data/test.json';
 let celebration_duration = 250;
 let celebration_ease = d3.easeCircleInOut;
 let celebration_line = d3.line().x(d=>d[0]).y(d=>d[1]).curve(d3.curveBasis);
